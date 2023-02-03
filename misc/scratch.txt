@@ -1,0 +1,12 @@
+                            printf("1. thread: %d :: class: %d :: right: %d :: left: %d :: att: %d :: (next|value|value_idx: %d|%f|%d)\n",idx,
+                                                                                                       (tree_table[next] & class_mask) >> class_shift,
+                                                                                                       right,
+                                                                                                       left,
+                                                                                                       atr,
+                                                                                                       next,
+                                                                                                       values_table[(4*idx)+atr],
+                                                                                                       (4*idx)+atr);
+
+
+
+        P[idx] = (tree_table[next] & class_mask) >> class_shift;
