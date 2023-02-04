@@ -29,7 +29,20 @@
                 cudaGetErrorString(error));                                    \
     }                                                                          \
 }
-
+/*
+ * Function:  importTable 
+ * --------------------
+ *  import tree table
+ *
+ *  path: path to the dir with the .txt table
+ *  table: where the table will be store
+ *  
+ * 
+ * note: the table scheme is:
+ * 
+ * 0000  00000000000 00000000000 00000 0 -> 32bits
+ * class right son   left son    attr  leaf
+ */
 void importTable(char *path, int *table)
 {
     FILE *fp;
@@ -58,6 +71,18 @@ void importTable(char *path, int *table)
 
 }
 
+/*
+ * Function:  importTH 
+ * --------------------
+ *  import threshold table
+ *
+ *  path: path to the dir with the .txt table
+ *  table: where the table will be store
+ *  
+ * 
+ * note: this function is used to import 
+ * the values table as well
+ */
 void importTH(char *path, float *table)
 {
     FILE *fp;
@@ -89,16 +114,24 @@ void importTH(char *path, float *table)
 
 
 }
-
-void printVector(int *vector, int size)
+/*
+ * Function:  printVector 
+ * --------------------
+ * print a vector of int
+ *
+ *  vector: vector that will be print
+ *  begin: index of the first number that will be print
+ *  end: index of the last number that will be print
+ */
+void printVector(int *vector, int begin, int end)
 {
-    for(int i=0;i<size;i++)
+    for(int i=begin;i<end;i++)
         printf("%d : %d\n",i,vector[i]);
 }
 
-void printVectorF(float *vector, int size)
+void printVectorF(float *vector, int begin, int end)
 {
-    for(int i=0;i<size;i++)
+    for(int i=begin;i<end;i++)
         printf("%d : %.2f\n",i,vector[i]);
 }
 
@@ -133,6 +166,16 @@ void initialData(float*        dest,
   
 }
 
+/*
+ * Function:  checkResults 
+ * --------------------
+ *  for DEBUG, check if the vector P is the same as the vector proof * (nElem/nProof) times
+ *
+ *  P: vector of int
+ *  proof: vector of int
+ *  nElem: size of P
+ *  nProof: size of proof
+ */
 void checkResult(int *P,int *proof, int nElem, int nProof){
     
     for(int i=0;i<nElem;i+=nProof){
@@ -210,7 +253,7 @@ int main()
     importTH(path_values,values_copy);
 
     initialData(values,values_copy,28,nElem/28);
-
+    printVectorF(values,nElem-1000,nElem);
     
 
     float *d_values, *d_att;
@@ -239,7 +282,7 @@ int main()
      //Código GPU
     // record start event
     CHECK(cudaEventRecord(start, 0));   
-    table_RF<<<nElem/nThreads, nBlocks>>>(d_att, d_values, d_table,d_P,nElem);
+    table_RF<<<1, nBlocks>>>(d_att, d_values, d_table,d_P,nElem);
     CHECK(cudaEventRecord(stop, 0));
     CHECK(cudaEventSynchronize(stop));
     // calculate elapsed time
@@ -254,8 +297,9 @@ int main()
 
 
     /* Check results*/
-    int proof[7] = {0,1,2,1,2,1,2};
-    checkResult(P,proof,((nElem/nThreads)-3),7);
+    // int proof[7] = {0,1,2,1,2,1,2};
+    // checkResult(P,proof,nElem-1,7);
+    // printVector(P,0,1);
 
     /* Free all memory*/
     CHECK(cudaFree(d_att));
