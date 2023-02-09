@@ -186,7 +186,7 @@ void checkResult(int *P,int *proof, int nElem, int nProof){
 
 }
 
-__global__ void table_RF(float *att_table, float *values_table, int *tree_table, int *P, const int N)
+__global__ void table_DT(float *att_table, float *values_table, int *tree_table, int *P, const int N)
 {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     int next = 0;
@@ -217,6 +217,8 @@ __global__ void table_RF(float *att_table, float *values_table, int *tree_table,
 
 
 }
+
+
 
 
 int main()
@@ -282,7 +284,7 @@ int main()
      //Código GPU
     // record start event
     CHECK(cudaEventRecord(start, 0));   
-    table_RF<<<1, nBlocks>>>(d_att, d_values, d_table,d_P,nElem);
+    table_DT<<<1, nBlocks>>>(d_att, d_values, d_table,d_P,nElem);
     CHECK(cudaEventRecord(stop, 0));
     CHECK(cudaEventSynchronize(stop));
     // calculate elapsed time
